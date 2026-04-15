@@ -90,6 +90,23 @@ def data_access(i_time, P_level, date_Ymd, extend = None, get_thickness = False)
     cape = ncf.variables["cape"][i_time, ::-1, :].filled(np.nan)
     ncf.close()
 
+    ncf = nc.Dataset(DataDir + "/ERA5_2m_dewpoint_temperature_" + date_Ymd + ".nc")
+    d2m = ncf.variables["d2m"][i_time, ::-1, :].filled(np.nan)
+    ncf.close()
+
+    ncf = nc.Dataset(DataDir + "/ERA5_relative_humidity_" + date_Ymd + ".nc")
+    rh = ncf.variables["r"][i_time, i_lev, ::-1, :].filled(np.nan)
+    ncf.close()
+
+    ncf = nc.Dataset(DataDir + "/ERA5_vertical_velocity_" + date_Ymd + ".nc")
+    # Vertical velocity (omega) in Pa/s; negative values indicate upward motion.
+    w = ncf.variables["w"][i_time, i_lev, ::-1, :].filled(np.nan)
+    ncf.close()
+
+    ncf = nc.Dataset(DataDir + "/ERA5_convective_inhibition_" + date_Ymd + ".nc")
+    cin = ncf.variables["cin"][i_time, ::-1, :].filled(np.nan)
+    ncf.close()
+
     if not(extend is None):
         lon_s = extend["lon_s"]
         lon_e = extend["lon_e"]
@@ -115,6 +132,10 @@ def data_access(i_time, P_level, date_Ymd, extend = None, get_thickness = False)
         v10 = v10[index_lat, :][:, index_lon]
         t2m = t2m[index_lat, :][:, index_lon]
         cape = cape[index_lat, :][:, index_lon]
+        d2m = d2m[index_lat, :][:, index_lon]
+        rh = rh[index_lat, :][:, index_lon]
+        w = w[index_lat, :][:, index_lon]
+        cin = cin[index_lat, :][:, index_lon]
         if get_thickness:
             thickness = thickness[index_lat, :][:, index_lon]
 
@@ -136,6 +157,10 @@ def data_access(i_time, P_level, date_Ymd, extend = None, get_thickness = False)
         "v10": v10,
         "t2m": t2m,
         "cape": cape,
+        "d2m": d2m,
+        "rh": rh,
+        "w": w,
+        "cin": cin,
     }
     if get_thickness:
         data_accessed["thickness"] = thickness
